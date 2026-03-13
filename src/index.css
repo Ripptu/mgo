@@ -7,6 +7,7 @@
   --color-gold: #D4AF37;
   --color-neon-blue: #00f3ff;
   --color-neon-red: #ff003c;
+  --color-neon-pink: #ff0055;
 }
 
 body {
@@ -48,4 +49,54 @@ body {
 
 .projector-hover:hover::before {
   left: 200%;
+}
+
+/* 80s Chrome Text Effect */
+.retro-title {
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #a1a1aa 40%,
+    #27272a 48%,
+    #000000 50%,
+    #D4AF37 52%,
+    #fef08a 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.4));
+}
+
+/* Typewriter cursor */
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Ticket Tear */
+.ticket-tear-top {
+  animation: tear-top 1s forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ticket-tear-bottom {
+  animation: tear-bottom 1s forwards cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes tear-top {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(-30px) rotate(-3deg); opacity: 0; }
+}
+@keyframes tear-bottom {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(30px) rotate(3deg); opacity: 0; }
+}
+
+/* 3D NFT Card */
+.nft-card {
+  transform-style: preserve-3d;
+  animation: float-nft 6s ease-in-out infinite;
+}
+@keyframes float-nft {
+  0%, 100% { transform: translateY(0) rotateX(10deg) rotateY(-10deg); }
+  50% { transform: translateY(-15px) rotateX(15deg) rotateY(10deg); }
 }

@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { useState, useRef, useEffect } from 'react';
-import { Ticket, Film, Calendar, MapPin, ArrowRight, Volume2, MonitorPlay, Users, CheckCircle2, ChevronDown, Camera } from 'lucide-react';
+import { Ticket, Film, Calendar, MapPin, ArrowRight, Volume2, MonitorPlay, Users, CheckCircle2, ChevronDown, Popcorn, Instagram, Twitter, HelpCircle, X, Gift, Sparkles } from 'lucide-react';
 
 const movies = [
   {
@@ -10,8 +10,8 @@ const movies = [
     date: "11. Apr 2026",
     time: "20:00 - 24:00",
     location: "Köln (Große Leinwand)",
-    poster: "https://s1.directupload.eu/images/260313/peurefzt.png",
-    bg: "https://s1.directupload.eu/images/260313/peurefzt.png",
+    poster: "https://s1.directupload.eu/images/260313/bi33cjz5.webp",
+    bg: "https://s1.directupload.eu/images/260313/bi33cjz5.webp",
     color: "from-orange-900/40"
   },
   {
@@ -21,8 +21,8 @@ const movies = [
     date: "11. Apr 2026",
     time: "20:00 - 24:00",
     location: "Köln (Große Leinwand)",
-    poster: "https://s1.directupload.eu/images/260313/nz7eqmwy.png",
-    bg: "https://s1.directupload.eu/images/260313/nz7eqmwy.png",
+    poster: "https://s1.directupload.eu/images/260313/53wlyte8.webp",
+    bg: "https://s1.directupload.eu/images/260313/53wlyte8.webp",
     color: "from-blue-900/40"
   },
   {
@@ -32,8 +32,8 @@ const movies = [
     date: "11. Apr 2026",
     time: "20:00 - 24:00",
     location: "Köln (Große Leinwand)",
-    poster: "https://s1.directupload.eu/images/260313/a4rxuthl.png",
-    bg: "https://s1.directupload.eu/images/260313/a4rxuthl.png",
+    poster: "https://s1.directupload.eu/images/260313/2wrpgq4c.webp",
+    bg: "https://s1.directupload.eu/images/260313/2wrpgq4c.webp",
     color: "from-red-900/40"
   }
 ];
@@ -85,13 +85,336 @@ function SpotlightCard({ icon: Icon, title, desc }: { icon: any, title: string, 
   );
 }
 
+// --- New Components ---
+function ParallaxBackground() {
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 3000], [0, -800]);
+  const y2 = useTransform(scrollY, [0, 3000], [0, -1200]);
+  const y3 = useTransform(scrollY, [0, 3000], [0, -500]);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <motion.div style={{ y: y1 }} className="absolute top-[20%] left-[5%] opacity-[0.03] text-[var(--color-gold)]"><Film size={150} /></motion.div>
+      <motion.div style={{ y: y2 }} className="absolute top-[60%] right-[10%] opacity-[0.03] text-[var(--color-neon-blue)]"><Popcorn size={120} /></motion.div>
+      <motion.div style={{ y: y3 }} className="absolute top-[80%] left-[15%] opacity-[0.03] text-[var(--color-neon-red)]"><Ticket size={100} /></motion.div>
+    </div>
+  );
+}
+
+function LiveCountdown() {
+  const [timeLeft, setTimeLeft] = useState({ d: 14, h: 5, m: 23, s: 59 });
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { d, h, m, s } = prev;
+        s--;
+        if (s < 0) { s = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 23; d--; }
+        return { d, h, m, s };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex gap-2 sm:gap-4">
+      {[
+        { label: 'Tage', value: timeLeft.d },
+        { label: 'Std', value: timeLeft.h },
+        { label: 'Min', value: timeLeft.m },
+        { label: 'Sek', value: timeLeft.s }
+      ].map((item, i) => (
+        <div key={i} className="flex flex-col items-center">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl flex items-center justify-center text-xl sm:text-2xl font-mono font-bold text-[var(--color-gold)] shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+            {item.value.toString().padStart(2, '0')}
+          </div>
+          <span className="text-[10px] sm:text-xs text-white/50 mt-2 uppercase tracking-widest">{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const reviews = [
+  "Beste Filmnacht meines Lebens. Der Sound war unfassbar!",
+  "Endlich Terminator 2 auf der großen Leinwand gesehen. Gänsehaut.",
+  "Die Stimmung im Saal war magisch. Nächstes Mal wieder!"
+];
+
+function Testimonials() {
+  const [index, setIndex] = useState(0);
+  const [text, setText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentReview = reviews[index];
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        setText(currentReview.substring(0, text.length + 1));
+        if (text === currentReview) {
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        setText(currentReview.substring(0, text.length - 1));
+        if (text === '') {
+          setIsDeleting(false);
+          setIndex((prev) => (prev + 1) % reviews.length);
+        }
+      }
+    }, isDeleting ? 30 : 80);
+    return () => clearTimeout(timeout);
+  }, [text, isDeleting, index]);
+
+  return (
+    <div className="h-32 flex flex-col items-center justify-center px-4 text-center">
+      <p className="text-sm text-white/40 uppercase tracking-widest mb-4">Was unsere Gäste sagen</p>
+      <p className="text-xl md:text-3xl font-mono text-[var(--color-neon-blue)]">
+        "{text}<span className="cursor-blink">_</span>"
+      </p>
+    </div>
+  );
+}
+
+function FilmQuiz() {
+  const [step, setStep] = useState(0);
+  const [won, setWon] = useState(false);
+  const [isWrong, setIsWrong] = useState(false);
+  
+  const questions = [
+    { q: "In welchem Jahr erschien 'Jurassic Park'?", a: ["1991", "1993", "1995"], correct: 1 },
+    { q: "Wie heißt der Computer in '2001: A Space Odyssey'?", a: ["HAL 9000", "Skynet", "Mother"], correct: 0 },
+    { q: "Welche Pille nimmt Neo in 'Matrix'?", a: ["Die Blaue", "Die Rote", "Die Grüne"], correct: 1 }
+  ];
+
+  const handleAnswer = (idx: number) => {
+    if (isWrong) return; // Prevent clicking while animating
+    
+    if (idx === questions[step].correct) {
+      if (step === questions.length - 1) setWon(true);
+      else setStep(s => s + 1);
+    } else {
+      setIsWrong(true);
+      setTimeout(() => {
+        setStep(0);
+        setIsWrong(false);
+      }, 800);
+    }
+  };
+
+  return (
+    <div className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 text-center relative overflow-hidden h-full flex flex-col justify-center">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--color-neon-blue)] to-[var(--color-neon-pink)]"></div>
+      
+      {!won ? (
+        <motion.div
+          animate={isWrong ? { 
+            x: [-10, 10, -10, 10, -5, 5, 0], 
+            scale: [1, 0.95, 1],
+            color: ["#ffffff", "#ff003c", "#ffffff"]
+          } : {}}
+          transition={{ duration: 0.5 }}
+          className="relative z-10"
+        >
+          <HelpCircle className={`w-12 h-12 mx-auto mb-6 transition-colors duration-300 ${isWrong ? 'text-[var(--color-neon-red)]' : 'text-[var(--color-neon-pink)]'}`} />
+          <p className="text-white/60 mb-8">Beantworte 3 Fragen richtig und gewinne einen 20% Rabattcode!</p>
+          
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-lg font-medium mb-6">{questions[step].q}</p>
+              <div className="grid grid-cols-1 gap-3">
+                {questions[step].a.map((ans, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => handleAnswer(i)} 
+                    className={`py-3 px-4 border rounded-xl transition-colors ${
+                      isWrong 
+                        ? 'border-[var(--color-neon-red)] bg-[var(--color-neon-red)]/10 text-[var(--color-neon-red)]' 
+                        : 'border-white/20 hover:bg-white/10'
+                    }`}
+                  >
+                    {ans}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+          
+          <div className="mt-6 text-sm text-white/40">
+            {isWrong ? <span className="text-[var(--color-neon-red)]">Falsch! Zurück zum Start...</span> : `Frage ${step + 1} von 3`}
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+          <Gift className="w-16 h-16 text-[var(--color-gold)] mx-auto mb-4" />
+          <p className="text-xl mb-2">Glückwunsch! Dein Code:</p>
+          <div className="text-3xl font-mono font-bold text-[var(--color-gold)] tracking-widest bg-white/5 py-4 rounded-xl border border-[var(--color-gold)]/30">RETRO20</div>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+const socialPosts = [
+  { user: "@kino_fan89", platform: "twitter", text: "Die Atmosphäre gestern war der Wahnsinn! #MGORetro" },
+  { user: "@sarah_loves_movies", platform: "instagram", text: "Popcorn, Neonlicht und Pulp Fiction. Perfekter Abend. 🍿✨ #MGORetro" },
+  { user: "@retro_gamer_cgn", platform: "twitter", text: "Wann startet der Vorverkauf für Blade Runner?! Take my money! 💸 #MGORetro" },
+  { user: "@cineast_max", platform: "instagram", text: "Endlich echte 70mm Projektion. Ein Traum wird wahr. 🎥 #MGORetro" }
+];
+
+function SocialWall() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {socialPosts.map((post, i) => (
+        <div key={i} className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-colors">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500"></div>
+            <div>
+              <div className="font-bold text-sm">{post.user}</div>
+              <div className="text-xs text-white/40 flex items-center gap-1">
+                {post.platform === 'twitter' ? <Twitter size={12} /> : <Instagram size={12} />}
+                {post.platform}
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-white/80 leading-relaxed">{post.text}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TicketModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  const [step, setStep] = useState<'buy' | 'tearing' | 'nft'>('buy');
+
+  useEffect(() => {
+    if (isOpen) setStep('buy');
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleBuy = () => {
+    setStep('tearing');
+    setTimeout(() => setStep('nft'), 1200);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+          <div className="relative w-full max-w-md">
+            {step === 'buy' && (
+              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-[#111] border border-white/10 p-8 rounded-3xl text-center shadow-2xl">
+                <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white"><X /></button>
+                <Ticket className="w-16 h-16 text-[var(--color-gold)] mx-auto mb-6" />
+                <h3 className="text-2xl font-bold mb-2">Retro Pass</h3>
+                <p className="text-white/60 mb-8">Sichere dir deinen Platz für das nächste Event.</p>
+                <button onClick={handleBuy} className="w-full py-4 bg-[var(--color-gold)] text-black font-bold rounded-full hover:bg-yellow-500 transition-colors">
+                  Jetzt Kaufen (24€)
+                </button>
+              </motion.div>
+            )}
+            {step === 'tearing' && (
+              <div className="relative h-64 flex flex-col items-center justify-center">
+                <div className="ticket-tear-top bg-[var(--color-gold)] w-64 h-24 rounded-t-xl border-b-2 border-dashed border-black flex items-center justify-center text-black font-bold text-xl">ADMIT ONE</div>
+                <div className="ticket-tear-bottom bg-[var(--color-gold)] w-64 h-24 rounded-b-xl flex items-center justify-center text-black font-bold text-xl">RETRO KLASSIKER</div>
+              </div>
+            )}
+            {step === 'nft' && (
+              <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="perspective-1000">
+                <div className="nft-card relative w-72 h-96 mx-auto bg-gradient-to-br from-purple-900 to-black rounded-2xl border border-[var(--color-neon-blue)] p-6 shadow-[0_0_30px_rgba(0,243,255,0.3)] flex flex-col items-center justify-center text-center">
+                  <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white"><X /></button>
+                  <Sparkles className="w-12 h-12 text-[var(--color-neon-blue)] mb-4" />
+                  <h4 className="text-xl font-bold text-[var(--color-neon-blue)] mb-2">Digital Collectible</h4>
+                  <p className="text-xs text-white/50 mb-6">Token #8492 - Apple/Google Wallet Ready</p>
+                  <div className="w-full h-32 bg-black/50 rounded-xl mb-6 flex items-center justify-center border border-white/10">
+                    <img src="https://s1.directupload.eu/images/260313/5v68fa39.jpg" alt="Logo" className="w-20 opacity-50" />
+                  </div>
+                  <button onClick={onClose} className="px-6 py-2 bg-white/10 rounded-full text-sm hover:bg-white/20 transition-colors">
+                    Zu Wallet hinzufügen
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function MenuOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
+          exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          transition={{ duration: 0.4 }}
+          className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center"
+        >
+          <button 
+            onClick={onClose}
+            className="absolute top-8 right-8 p-4 text-white/50 hover:text-white hover:rotate-90 transition-all duration-300"
+          >
+            <X size={40} />
+          </button>
+          
+          <nav className="flex flex-col items-center gap-8">
+            {['Programm', 'Erlebnis', 'Quiz', 'FAQ'].map((item, i) => (
+              <motion.a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                onClick={onClose}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 + 0.2 }}
+                className="text-4xl md:text-6xl font-bold uppercase tracking-widest text-white/70 hover:text-[var(--color-gold)] hover:scale-110 transition-all duration-300"
+              >
+                {item}
+              </motion.a>
+            ))}
+          </nav>
+          
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="absolute bottom-12 flex gap-8 text-white/40"
+          >
+            <a href="#" className="hover:text-[var(--color-neon-blue)] transition-colors"><Twitter /></a>
+            <a href="#" className="hover:text-[var(--color-neon-pink)] transition-colors"><Instagram /></a>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function App() {
   const [activeBg, setActiveBg] = useState(movies[0].bg);
   const [activeColor, setActiveColor] = useState(movies[0].color);
   const [voted, setVoted] = useState<number | null>(null);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const hour = new Date().getHours();
+  const isNight = hour >= 18 || hour <= 6;
+  const neonOpacity = isNight ? 1 : 0.4;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[var(--color-gold)] selection:text-black">
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[var(--color-gold)] selection:text-black" style={{ '--neon-opacity': neonOpacity } as React.CSSProperties}>
+      <ParallaxBackground />
+      <TicketModal isOpen={isTicketModalOpen} onClose={() => setIsTicketModalOpen(false)} />
+      <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <div className="film-grain"></div>
       
       {/* Dynamic Background for Program Section */}
@@ -124,7 +447,7 @@ export default function App() {
           }}
           referrerPolicy="no-referrer"
         />
-        <button className="projector-hover px-6 py-2 border border-white/20 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-colors">
+        <button onClick={() => setIsMenuOpen(true)} className="projector-hover px-6 py-2 border border-white/20 rounded-full text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-colors">
           Menü
         </button>
       </nav>
@@ -139,7 +462,8 @@ export default function App() {
               transition={{ duration: 1, delay: 0.2 }}
               className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[0.9] mb-8"
             >
-              KÖLN, MACH <span className="font-serif italic font-normal text-[var(--color-gold)]">dich bereit für die große</span> LEINWAND.
+              KÖLN, MACH <span className="font-serif italic font-normal text-[var(--color-gold)]">dich bereit</span><br />
+              <span className="font-serif italic font-normal text-[var(--color-gold)]">für die große</span> LEINWAND.
             </motion.h1>
             
             <motion.p 
@@ -151,27 +475,32 @@ export default function App() {
               Die 90er sind zurück. Keine Streaming-Kompromisse. Nur echtes Zelluloid-Gefühl, massiver Sound und 800 Gleichgesinnte im Dunkeln.
             </motion.p>
 
-            <motion.button
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.8 }}
-              className="group relative inline-flex items-center gap-4 px-8 py-4 bg-transparent border border-[var(--color-gold)] text-[var(--color-gold)] rounded-full uppercase tracking-widest font-semibold overflow-hidden"
             >
-              <div className="absolute inset-0 bg-[var(--color-gold)]/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-              <span className="relative z-10">Tickets Sichern</span>
-              <Ticket className="relative z-10 w-5 h-5 group-hover:rotate-12 transition-transform" />
-              {/* Neon glow effect */}
-              <div className="absolute -inset-2 bg-[var(--color-gold)] opacity-20 blur-xl rounded-full group-hover:opacity-40 transition-opacity duration-300"></div>
-            </motion.button>
+              <button
+                onClick={() => setIsTicketModalOpen(true)}
+                className="group relative inline-flex items-center gap-4 px-8 py-4 bg-[#110e00] border border-[var(--color-gold)] text-[var(--color-gold)] rounded-full uppercase tracking-widest font-semibold overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-[var(--color-gold)]/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                <span className="relative z-10">Digitales Ticket zur Erinnerung sichern</span>
+                <Ticket className="relative z-10 w-5 h-5 group-hover:rotate-12 transition-transform" />
+              </button>
+            </motion.div>
           </div>
         </section>
 
         {/* Program Section */}
-        <section className="py-32 px-6 md:px-20">
+        <section id="programm" className="py-32 px-6 md:px-20">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-4 mb-20">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">PROGRAMM <span className="font-serif italic text-white/50">2026</span></h2>
-              <div className="h-[1px] flex-1 bg-white/20"></div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-20">
+              <div className="flex items-center gap-4 flex-1">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">PROGRAMM <span className="font-serif italic text-white/50">2026</span></h2>
+                <div className="h-[1px] flex-1 bg-white/20"></div>
+              </div>
+              <LiveCountdown />
             </div>
 
             <div className="space-y-48">
@@ -183,7 +512,8 @@ export default function App() {
                   onInView={() => {
                     setActiveBg(movie.bg);
                     setActiveColor(movie.color);
-                  }} 
+                  }}
+                  onTicketClick={() => setIsTicketModalOpen(true)}
                 />
               ))}
             </div>
@@ -191,7 +521,7 @@ export default function App() {
         </section>
 
         {/* The Experience Section (Premium Spotlight Cards) */}
-        <section className="py-32 px-6 md:px-20 bg-black/95 border-t border-white/10 relative z-20 overflow-hidden">
+        <section id="erlebnis" className="py-32 px-6 md:px-20 bg-black/95 border-t border-white/10 relative z-20 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.05)_0%,transparent_50%)]"></div>
           <div className="max-w-7xl mx-auto relative z-10">
             <motion.div 
@@ -220,6 +550,25 @@ export default function App() {
                 title="800 Fans"
                 desc="Das kollektive Lachen, das gemeinsame Erschrecken. Kino ist ein Gemeinschaftserlebnis. Sei Teil der Crowd."
               />
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-20 px-6 md:px-20 bg-[#050505] relative z-20 border-t border-white/10">
+          <Testimonials />
+        </section>
+
+        {/* Film Quiz & Social Wall */}
+        <section id="quiz" className="py-32 px-6 md:px-20 bg-[#0a0a0a] relative z-20 border-t border-white/10">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-12">FILM <span className="font-serif italic text-[var(--color-neon-pink)]">Quiz</span></h2>
+              <FilmQuiz />
+            </div>
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-12">SOCIAL <span className="font-serif italic text-[var(--color-neon-blue)]">Wall</span></h2>
+              <SocialWall />
             </div>
           </div>
         </section>
@@ -283,7 +632,7 @@ export default function App() {
         </section>
 
         {/* FAQ Section (NEW) */}
-        <section className="py-32 px-6 md:px-20 bg-[#050505] relative z-20 border-t border-white/10">
+        <section id="faq" className="py-32 px-6 md:px-20 bg-[#050505] relative z-20 border-t border-white/10">
           <div className="max-w-3xl mx-auto">
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -344,7 +693,7 @@ export default function App() {
   );
 }
 
-function MovieItem({ movie, index, onInView }: { movie: any, index: number, onInView: () => void }) {
+function MovieItem({ movie, index, onInView, onTicketClick }: { movie: any, index: number, onInView: () => void, onTicketClick: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -408,7 +757,7 @@ function MovieItem({ movie, index, onInView }: { movie: any, index: number, onIn
           </div>
         </div>
 
-        <button className="projector-hover inline-flex items-center gap-3 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full uppercase tracking-widest font-semibold transition-colors backdrop-blur-sm">
+        <button onClick={onTicketClick} className="projector-hover inline-flex items-center gap-3 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full uppercase tracking-widest font-semibold transition-colors backdrop-blur-sm">
           Tickets <ArrowRight className="w-4 h-4" />
         </button>
       </div>
