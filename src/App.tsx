@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { useState, useRef, useEffect } from 'react';
-import { Ticket, Film, Calendar, MapPin, ArrowRight, Volume2, MonitorPlay, Users, CheckCircle2, ChevronDown, Popcorn, Instagram, Twitter, HelpCircle, X, Gift, Sparkles } from 'lucide-react';
+import { Ticket, Film, Calendar, MapPin, ArrowRight, Volume2, MonitorPlay, Users, CheckCircle2, ChevronDown, Popcorn, Instagram, Twitter, HelpCircle, X, Gift, Sparkles, QrCode } from 'lucide-react';
 
 const movies = [
   {
@@ -102,37 +102,68 @@ function ParallaxBackground() {
 }
 
 function LiveCountdown() {
-  const [timeLeft, setTimeLeft] = useState({ d: 14, h: 5, m: 23, s: 59 });
+  const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
   
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        let { d, h, m, s } = prev;
-        s--;
-        if (s < 0) { s = 59; m--; }
-        if (m < 0) { m = 59; h--; }
-        if (h < 0) { h = 23; d--; }
-        return { d, h, m, s };
-      });
-    }, 1000);
+    // Target date: April 11, 2026, 20:00:00
+    const targetDate = new Date('2026-04-11T20:00:00+02:00').getTime();
+
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+      
+      if (difference > 0) {
+        setTimeLeft({
+          d: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          m: Math.floor((difference / 1000 / 60) % 60),
+          s: Math.floor((difference / 1000) % 60)
+        });
+      } else {
+        setTimeLeft({ d: 0, h: 0, m: 0, s: 0 });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="flex gap-2 sm:gap-4">
-      {[
-        { label: 'Tage', value: timeLeft.d },
-        { label: 'Std', value: timeLeft.h },
-        { label: 'Min', value: timeLeft.m },
-        { label: 'Sek', value: timeLeft.s }
-      ].map((item, i) => (
-        <div key={i} className="flex flex-col items-center">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl flex items-center justify-center text-xl sm:text-2xl font-mono font-bold text-[var(--color-gold)] shadow-[0_0_15px_rgba(212,175,55,0.1)]">
-            {item.value.toString().padStart(2, '0')}
-          </div>
-          <span className="text-[10px] sm:text-xs text-white/50 mt-2 uppercase tracking-widest">{item.label}</span>
+    <div className="flex flex-col items-center md:items-end gap-4 bg-black/60 p-6 sm:p-8 rounded-2xl border-2 border-[var(--color-neon-red)]/40 shadow-[0_0_50px_rgba(255,0,60,0.2)] backdrop-blur-md relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 bg-[var(--color-neon-red)]/5 blur-3xl"></div>
+      
+      <div className="flex items-center gap-3 relative z-10">
+        <div className="w-3 h-3 rounded-full bg-[var(--color-neon-red)] animate-ping shadow-[0_0_10px_rgba(255,0,60,1)]"></div>
+        <div className="text-[var(--color-neon-red)] font-black tracking-[0.2em] uppercase text-sm sm:text-lg drop-shadow-[0_0_8px_rgba(255,0,60,0.8)]">
+          Nächstes Event: 11. April 2026
         </div>
-      ))}
+      </div>
+      
+      <div className="flex gap-3 sm:gap-5 relative z-10">
+        {[
+          { label: 'Tage', value: timeLeft.d },
+          { label: 'Std', value: timeLeft.h },
+          { label: 'Min', value: timeLeft.m },
+          { label: 'Sek', value: timeLeft.s }
+        ].map((item, i) => (
+          <div key={i} className="flex flex-col items-center">
+            <div className="relative w-16 h-20 sm:w-24 sm:h-28 bg-[#0a0a0a] border-2 border-[var(--color-neon-red)]/60 rounded-xl flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(255,0,60,0.4)] group hover:border-[var(--color-neon-red)] hover:shadow-[0_0_40px_rgba(255,0,60,0.8)] transition-all duration-300">
+              {/* Scanline effect */}
+              <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.6)_50%)] bg-[length:100%_4px] z-10 pointer-events-none"></div>
+              
+              <span className="relative z-20 text-4xl sm:text-6xl font-mono font-black text-white drop-shadow-[0_0_15px_rgba(255,0,60,1)]">
+                {item.value.toString().padStart(2, '0')}
+              </span>
+              
+              {/* Glare effect */}
+              <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+            </div>
+            <span className="text-xs sm:text-sm text-[var(--color-neon-red)] mt-3 uppercase tracking-[0.2em] font-bold">{item.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -295,7 +326,15 @@ function TicketModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
   const [step, setStep] = useState<'buy' | 'tearing' | 'nft'>('buy');
 
   useEffect(() => {
-    if (isOpen) setStep('buy');
+    if (isOpen) {
+      setStep('buy');
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -314,10 +353,10 @@ function TicketModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-[#111] border border-white/10 p-8 rounded-3xl text-center shadow-2xl">
                 <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white"><X /></button>
                 <Ticket className="w-16 h-16 text-[var(--color-gold)] mx-auto mb-6" />
-                <h3 className="text-2xl font-bold mb-2">Retro Pass</h3>
-                <p className="text-white/60 mb-8">Sichere dir deinen Platz für das nächste Event.</p>
+                <h3 className="text-2xl font-bold mb-2">Digitales Ticket</h3>
+                <p className="text-white/60 mb-8">Sichere dir dein digitales Ticket zur Erinnerung und erhalte zusätzlich 10% Rabatt auf Snacks & Drinks beim nächsten Event.</p>
                 <button onClick={handleBuy} className="w-full py-4 bg-[var(--color-gold)] text-black font-bold rounded-full hover:bg-yellow-500 transition-colors">
-                  Jetzt Kaufen (24€)
+                  Kostenlos sichern
                 </button>
               </motion.div>
             )}
@@ -329,16 +368,18 @@ function TicketModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             )}
             {step === 'nft' && (
               <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="perspective-1000">
-                <div className="nft-card relative w-72 h-96 mx-auto bg-gradient-to-br from-purple-900 to-black rounded-2xl border border-[var(--color-neon-blue)] p-6 shadow-[0_0_30px_rgba(0,243,255,0.3)] flex flex-col items-center justify-center text-center">
+                <div className="nft-card relative w-72 h-auto mx-auto bg-gradient-to-br from-[#1a1a1a] to-black rounded-2xl border border-[var(--color-gold)] p-6 shadow-[0_0_30px_rgba(212,175,55,0.2)] flex flex-col items-center justify-center text-center">
                   <button onClick={onClose} className="absolute top-4 right-4 text-white/50 hover:text-white"><X /></button>
-                  <Sparkles className="w-12 h-12 text-[var(--color-neon-blue)] mb-4" />
-                  <h4 className="text-xl font-bold text-[var(--color-neon-blue)] mb-2">Digital Collectible</h4>
-                  <p className="text-xs text-white/50 mb-6">Token #8492 - Apple/Google Wallet Ready</p>
-                  <div className="w-full h-32 bg-black/50 rounded-xl mb-6 flex items-center justify-center border border-white/10">
-                    <img src="https://s1.directupload.eu/images/260313/5v68fa39.jpg" alt="Logo" className="w-20 opacity-50" />
+                  <Gift className="w-12 h-12 text-[var(--color-gold)] mb-4" />
+                  <h4 className="text-xl font-bold text-[var(--color-gold)] mb-2">10% Rabatt Gutschein</h4>
+                  <p className="text-xs text-white/60 mb-6">Gültig für Popcorn & Drinks am 11. April 2026</p>
+                  <div className="w-full bg-white rounded-xl mb-6 p-4 flex flex-col items-center justify-center border border-white/10">
+                    <QrCode className="w-24 h-24 text-black" />
+                    <span className="text-black font-mono text-xs mt-2 font-bold tracking-widest">RETRO-10-PCT</span>
                   </div>
+                  <p className="text-xs text-white/40 mb-4">Mache einen Screenshot von diesem Ticket und zeige ihn an der Kasse vor.</p>
                   <button onClick={onClose} className="px-6 py-2 bg-white/10 rounded-full text-sm hover:bg-white/20 transition-colors">
-                    Zu Wallet hinzufügen
+                    Schließen
                   </button>
                 </div>
               </motion.div>
@@ -351,6 +392,17 @@ function TicketModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
 }
 
 function MenuOverlay({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
