@@ -1,10 +1,6 @@
-import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { useState, useRef, useEffect } from 'react';
 import { Ticket, Film, Calendar, MapPin, ArrowRight, Volume2, MonitorPlay, Users, CheckCircle2, ChevronDown, Camera } from 'lucide-react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Box, Cylinder, Environment, Float, ContactShadows, RoundedBox } from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import * as THREE from 'three';
 
 const movies = [
   {
@@ -41,59 +37,6 @@ const movies = [
     color: "from-red-900/40"
   }
 ];
-
-// --- Premium 3D Cyber Helmet (80s/90s Synthwave) ---
-function CyberHelmet() {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
-      groupRef.current.position.y = Math.sin(state.clock.elapsedTime) * 0.1;
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, -0.5, 0]}>
-      {/* Main Helmet Shell - Glossy Black/Purple */}
-      <RoundedBox args={[2, 2.4, 2.2]} radius={0.4} smoothness={4} position={[0, 0, 0]}>
-        <meshPhysicalMaterial 
-          color="#0a0a0a" 
-          metalness={0.9} 
-          roughness={0.1} 
-          clearcoat={1} 
-          clearcoatRoughness={0.1}
-          envMapIntensity={2}
-        />
-      </RoundedBox>
-      
-      {/* Glowing Neon Visor (Pink) */}
-      <RoundedBox args={[2.1, 0.6, 1.8]} radius={0.1} smoothness={4} position={[0, 0.3, 0.4]}>
-        <meshStandardMaterial 
-          color="#ff0055" 
-          emissive="#ff0055" 
-          emissiveIntensity={4} 
-          toneMapped={false} 
-        />
-      </RoundedBox>
-
-      {/* Side Details (Cyan) */}
-      <Cylinder args={[0.4, 0.4, 2.3]} rotation={[0, 0, Math.PI / 2]} position={[0, 0, -0.2]}>
-        <meshStandardMaterial 
-          color="#00f3ff" 
-          emissive="#00f3ff" 
-          emissiveIntensity={2} 
-          toneMapped={false} 
-        />
-      </Cylinder>
-
-      {/* Ear pieces */}
-      <Cylinder args={[0.6, 0.6, 2.4]} rotation={[0, 0, Math.PI / 2]} position={[0, -0.4, 0]}>
-        <meshPhysicalMaterial color="#222" metalness={0.8} roughness={0.4} />
-      </Cylinder>
-    </group>
-  );
-}
 
 // --- Premium Spotlight Card Component ---
 function SpotlightCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
@@ -278,69 +221,6 @@ export default function App() {
                 desc="Das kollektive Lachen, das gemeinsame Erschrecken. Kino ist ein Gemeinschaftserlebnis. Sei Teil der Crowd."
               />
             </div>
-          </div>
-        </section>
-
-        {/* Event Character Section (NEW) */}
-        <section className="py-32 px-6 md:px-20 bg-[#0a0a0a] relative z-20 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-neon-blue)_0%,transparent_50%)] opacity-5"></div>
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="w-full md:w-1/2"
-            >
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">DRESSCODE: <span className="font-serif italic text-[var(--color-neon-blue)]">80s & 90s</span></h2>
-              <p className="text-lg text-white/70 leading-relaxed mb-8">
-                Holt die Neon-Jacken, Retro-Sneaker und Lederjacken raus! Wir feiern nicht nur die Filme, sondern das gesamte Jahrzehnt des großen Kinos. 
-              </p>
-              <ul className="space-y-6 text-white/80">
-                <li className="flex items-center gap-4 text-lg">
-                  <div className="p-2 rounded-full bg-[var(--color-neon-blue)]/10 text-[var(--color-neon-blue)]"><Camera className="w-5 h-5" /></div>
-                  Exklusive Retro-Fotowand im Foyer
-                </li>
-                <li className="flex items-center gap-4 text-lg">
-                  <div className="p-2 rounded-full bg-[var(--color-neon-blue)]/10 text-[var(--color-neon-blue)]"><CheckCircle2 className="w-5 h-5" /></div>
-                  Best-Dressed Gewinnspiel
-                </li>
-                <li className="flex items-center gap-4 text-lg">
-                  <div className="p-2 rounded-full bg-[var(--color-neon-blue)]/10 text-[var(--color-neon-blue)]"><Volume2 className="w-5 h-5" /></div>
-                  90s Mixtape Warm-up vor dem Film
-                </li>
-              </ul>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1 }}
-              className="w-full md:w-1/2 aspect-square relative cursor-grab active:cursor-grabbing"
-            >
-              {/* 3D Canvas */}
-              <div className="absolute inset-0 rounded-3xl overflow-hidden bg-gradient-to-tr from-[#0a0a0a] to-[#111] border border-white/10 shadow-2xl shadow-[var(--color-neon-blue)]/10">
-                <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-                  <color attach="background" args={['#050505']} />
-                  <ambientLight intensity={0.5} />
-                  <pointLight position={[10, 10, 10]} intensity={1} color="#00f3ff" />
-                  <pointLight position={[-10, -10, -10]} intensity={1} color="#ff003c" />
-                  <Float speed={2} rotationIntensity={0.5} floatIntensity={2}>
-                    <CyberHelmet />
-                  </Float>
-                  <ContactShadows position={[0, -3.5, 0]} opacity={0.4} scale={10} blur={2} far={4} />
-                  <Environment preset="city" />
-                  <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-                  <EffectComposer>
-                    <Bloom luminanceThreshold={1} intensity={1.5} mipmapBlur />
-                  </EffectComposer>
-                </Canvas>
-                <div className="absolute bottom-4 left-0 right-0 text-center text-white/30 text-sm font-mono pointer-events-none">
-                  [ Drag to rotate ]
-                </div>
-              </div>
-            </motion.div>
           </div>
         </section>
 
